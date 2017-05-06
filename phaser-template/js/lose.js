@@ -1,15 +1,15 @@
 "use strict"; 
 
-var WinState = function(game) {};
+var LoseState = function(game) {};
 
-WinState.prototype.preload = function() {
+LoseState.prototype.preload = function() {
 }
 
-WinState.prototype.create = function() {
+LoseState.prototype.create = function() {
     this.game.add.text(100,100,"you lose", {fill:"#FFFFFF"})
 
 }
 
-WinState.prototype.update = function() {
+LoseState.prototype.update = function() {
 
 }

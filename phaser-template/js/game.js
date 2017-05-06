@@ -2,18 +2,18 @@
 
 var GameState = function(game) {};
 
-GameState.prototype.preload = function()
-{
+GameState.prototype.preload = function(){
     this.game.load.image('player', 'Assets/player.png');
-    this.game.load.image('platform', 'Assets/wallHorizontal.png')
-    this.game.load.image('coin', 'Assets/coin.png')
-    this.game.load.audio('jumpSound', 'Assets/jump.ogg')
-    this.game.load.audio('coinSound', 'Assets/coin.ogg')
+    this.game.load.image('platform', 'Assets/wallHorizontal.png');
+    this.game.load.image('coin', 'Assets/coin.png');
+    this.game.load.image('particle', 'Assets/pixel.png');
+    this.game.load.audio('jumpSound', 'Assets/jump.ogg');
+    this.game.load.audio('coinSound', 'Assets/coin.ogg');
 }
 
-GameState.prototype.create = function()
-{
-    this.game.physics.startSystem(Phaser.Physics.ARCADE);    
+GameState.prototype.create = function(){
+    this.game.physics.startSystem(Phaser.Physics.ARCADE);
+    this.game.stage.backgroundColor = "#78909c"
     
     //criando som
     this.jumpSound = this.game.add.audio('jumpSound');
@@ -32,24 +32,26 @@ GameState.prototype.create = function()
     this.coins.create(300,350,'coin');
     this.coins.create(100,250,'coin');
     
+    //Criando os objetos individualmente
+    /*this.platform = this.game.add.sprite(300, 500, 'platform');
+    this.game.physics.enable(this.platform);
+    this.platform.body.immovable = true;
     
-//    this.platform = this.game.add.sprite(300, 500, 'platform');
-//    this.game.physics.enable(this.platform);
-//    this.platform.body.immovable = true;
-//    
-//    this.platform2 = this.game.add.sprite(100, 400, 'platform');
-//    this.game.physics.enable(this.platform2);
-//    this.platform2.body.immovable = true;
-//    
-//    this.platform3 = this.game.add.sprite(300, 100, 'platform');
-//    this.game.physics.enable(this.platform3);
-//    this.platform3.body.immovable = true;
+    this.platform2 = this.game.add.sprite(100, 400, 'platform');
+    this.game.physics.enable(this.platform2);
+    this.platform2.body.immovable = true;
     
+    this.platform3 = this.game.add.sprite(300, 100, 'platform');
+    this.game.physics.enable(this.platform3);
+    this.platform3.body.immovable = true;*/
+    
+    //Criando os objetos em grupo
     this.platforms = this.game.add.group();
     this.platforms.enableBody = true;
     this.platforms.create(300, 500, 'platform');
     this.platforms.create(300, 300, 'platform');
-    //this.platforms = this.game.add.sprite(100, 400, 'platform');    
+    //this.platforms = this.game.add.sprite(100, 400, 'platform');
+    
     //Plataforma móvel
     this.movingPlatform = this.platforms.create(100,400,'platform');
     this.platforms.setAll('body.immovable', true);
@@ -66,10 +68,22 @@ GameState.prototype.create = function()
     this.coinCount = 3;
     console.debug("Coins: " + this.coinCount);
     
+    //Emissor de particulas
+    this.particleEmitter = this.game.add.emitter(0,0,100);
+    this.particleEmitter.makeParticles ('particle');
 }
 
-GameState.prototype.update = function()
-{
+GameState.prototype.coinCollision = function(player, coin){
+    this.coinSound.play();
+    this.coinCount--;
+    console.debug("CoinCount: " + this.coinCount);
+    this.particleEmitter.x = coin.x;
+    this.particleEmitter.y = coin.y;
+    this.particleEmitter.start(true, 500, null, 10);
+    coin.kill();
+}
+
+GameState.prototype.update = function(){
     //Colisões
     this.game.physics.arcade.collide(this.player, this.platforms);
     this.game.physics.arcade.collide(this.player, this.coins, this.coinCollision, null, this);
@@ -77,11 +91,14 @@ GameState.prototype.update = function()
     
     //this.game.physics.arcade.collide(this.player, this.platform);   
     
+    //Movimentaçao do Player
     if(this.jump.isDown && this.player.body.touching.down)
     {
         this.player.body.velocity.y = -450;
-        
         this.jumpSound.play();
+        this.player.angle = 0;
+        this.game.add.tween(this.player).to({angle:360}, 750, Phaser.Easing.Quadratic.Out).start();
+        this.game.add.tween(this.player.scale).to({x: 1.5, y: 1.5}, 375).yoyo(true).start();
     }
     
     if(this.left.isDown)
@@ -114,11 +131,4 @@ GameState.prototype.update = function()
         this.game.state.start('lose');
         console.debug("You Lose")
     }
-}
-
-GameState.prototype.coinCollision = function(player, coin){
-    this.coinSound.play();
-    this.coinCount--;
-    console.debug("CoinCount: " + this.coinCount)
-    coin.kill();
 }
