@@ -26,7 +26,3 @@ hs_err_pid*
 /.idea/
 /lib/
 
-assets/
-css/
-index.html
-js/
