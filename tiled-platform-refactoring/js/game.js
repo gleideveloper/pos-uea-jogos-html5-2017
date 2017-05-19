@@ -34,9 +34,9 @@ GameState.prototype.create = function () {
 
     this.createPlayer();
 
-    this.createDiamond();
+    this.createCoin();
 
-    this.createBat();
+    this.createEnemy();
 
     this.createControlKey();
 
@@ -124,7 +124,7 @@ GameState.prototype.lose = function(){
     this.game.state.start('lose');
 }
 
-GameState.prototype.createDiamond = function () {
+GameState.prototype.createCoin = function () {
 // Grupo de diamantes
     this.diamonds = this.game.add.physicsGroup();
     this.level1.createFromObjects('Items', 'diamond', 'items', 5, true, false, this.diamonds);
@@ -142,7 +142,7 @@ GameState.prototype.createDiamond = function () {
     this.particleEmitter.makeParticles ('particle');
 }
 
-GameState.prototype.createBat = function () {
+GameState.prototype.createEnemy = function () {
     // Grupo de morcegos:
     this.bats = this.game.add.physicsGroup();
     this.level1.createFromObjects('Enemies', 'bat', 'enemies', 8, true, false, this.bats);
