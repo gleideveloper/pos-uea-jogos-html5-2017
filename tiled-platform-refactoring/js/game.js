@@ -10,12 +10,15 @@ GameState.prototype.preload = function () {
     //Carrega o tiles do spritesheets
     this.game.load.image('mapTiles', 'assets/spritesheets/tiles.png');
 
-    // Para carregar um spritesheet, os sprites são de 32x32(wxh) pixels, e há 8 sprites no arquivo
+    // Carrega um spritesheet, os sprites são de 32x32(wxh) pixels, e há 8 sprites no arquivo
     this.game.load.spritesheet('player', 'assets/spritesheets/player.png', 32, 32, 8);
     this.game.load.spritesheet('items', 'assets/spritesheets/items.png', 32, 32, 16);
     this.game.load.spritesheet('enemies', 'assets/spritesheets/enemies.png', 32, 32, 12);
 
-    // Para carregar os sons
+    //Carrega a particula do efeito do diamante
+    this.game.load.image('particle', 'assets/spritesheets/pixel.png');
+
+    // Carregas os sons
     this.game.load.audio('jumpSound', 'assets/sounds/jump.wav');
     this.game.load.audio('pickupSound', 'assets/sounds/pickup.wav');
     this.game.load.audio('playerDeathSound', 'assets/sounds/hurt3.ogg');
@@ -77,6 +80,12 @@ GameState.prototype.itemCollect = function(player, diamond){
         this.music.stop();
         this.game.state.start('win');
     }
+    //Define o ponto de colisão
+    this.particleEmitter.x = diamond.x;
+    this.particleEmitter.y = diamond.y;
+    //Emite o efeito de particula
+    this.particleEmitter.start(true, 500, null, 10);
+
     this.pickupSound.play(); // som de pegar o diamante
     diamond.kill(); // removendo o diamante do jogo
 }
@@ -127,10 +136,14 @@ GameState.prototype.createDiamond = function () {
         diamond.animations.add('spin', [4, 5, 6, 7, 6, 5], 6, true);
         diamond.animations.play('spin');
     });
+
+    //Emissor de particulas
+    this.particleEmitter = this.game.add.emitter(0,0,100);
+    this.particleEmitter.makeParticles ('particle');
 }
 
 GameState.prototype.createBat = function () {
-// Grupo de morcegos:
+    // Grupo de morcegos:
     this.bats = this.game.add.physicsGroup();
     this.level1.createFromObjects('Enemies', 'bat', 'enemies', 8, true, false, this.bats);
     this.bats.forEach(function (bat) {
